@@ -14,7 +14,7 @@ public class Address {
     private String houseNumber;
     private String zipCode;
     @OneToMany(mappedBy = "address")
-    private Set<Owner> users;
+    private Set<User> users;
 
     public void setId(Long id) {
         this.id = id;
@@ -56,11 +56,11 @@ public class Address {
         this.zipCode = zipCode;
     }
 
-    public Set<Owner> getUsers() {
+    public Set<User> getUsers() {
         return users;
     }
 
-    public void setUsers(Set<Owner> users) {
+    public void setUsers(Set<User> users) {
         this.users = users;
     }
 }

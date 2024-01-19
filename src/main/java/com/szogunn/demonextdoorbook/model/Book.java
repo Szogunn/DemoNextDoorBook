@@ -18,7 +18,7 @@ public class Book {
     private String publisher;
     private LocalDate publishedYear;
     @ManyToOne
-    private Owner owner;
+    private User user;
     @ManyToMany
     @JoinTable(name = "book_authors", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "author_id"))
     private Set<Author> authors;
@@ -79,12 +79,12 @@ public class Book {
         this.publishedYear = publishedYear;
     }
 
-    public Owner getOwner() {
-        return owner;
+    public User getOwner() {
+        return user;
     }
 
-    public void setOwner(Owner owner) {
-        this.owner = owner;
+    public void setOwner(User user) {
+        this.user = user;
     }
 
     public Set<Author> getAuthors() {

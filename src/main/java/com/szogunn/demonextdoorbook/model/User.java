@@ -6,7 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class Owner {
+@Table(name = "users")
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,10 +16,10 @@ public class Owner {
     private String email;
     @ManyToOne()
     private Address address;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<Book> books;
 
-    public Owner(String login, String password, String email, Address address) {
+    public User(String login, String password, String email, Address address) {
         this.login = login;
         this.password = password;
         this.email = email;
@@ -26,7 +27,7 @@ public class Owner {
         this.books = new HashSet<>();
     }
 
-    public Owner() {
+    public User() {
     }
 
     public void setId(Long id) {

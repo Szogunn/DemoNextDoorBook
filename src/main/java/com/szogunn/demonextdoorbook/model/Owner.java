@@ -2,6 +2,7 @@ package com.szogunn.demonextdoorbook.model;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -16,6 +17,17 @@ public class Owner {
     private Address address;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")
     private Set<Book> books;
+
+    public Owner(String login, String password, String email, Address address) {
+        this.login = login;
+        this.password = password;
+        this.email = email;
+        this.address = address;
+        this.books = new HashSet<>();
+    }
+
+    public Owner() {
+    }
 
     public void setId(Long id) {
         this.id = id;

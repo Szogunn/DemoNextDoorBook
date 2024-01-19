@@ -19,7 +19,7 @@ public class UserControllerImpl implements UserController {
     @Override
     public ResponseEntity<String> signUp(SignupRequest signupRequest) {
         try {
-            userService.signUp(signupRequest);
+            return userService.signUp(signupRequest);
         } catch (Exception ex){
             ex.printStackTrace();
         }

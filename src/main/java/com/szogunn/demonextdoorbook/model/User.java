@@ -14,7 +14,7 @@ public class User {
     private String login;
     private String password;
     private String email;
-    @ManyToOne()
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Address address;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<Book> books;

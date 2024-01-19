@@ -7,8 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
 @RestController
 public class UserControllerImpl implements UserController {
 
@@ -21,7 +19,7 @@ public class UserControllerImpl implements UserController {
     @Override
     public ResponseEntity<String> signUp(SignupRequest signupRequest) {
         try {
-
+            userService.signUp(signupRequest);
         } catch (Exception ex){
             ex.printStackTrace();
         }

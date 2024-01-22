@@ -1,5 +1,6 @@
 package com.szogunn.demonextdoorbook.controllers;
 
+import com.szogunn.demonextdoorbook.payloads.LoginRequest;
 import com.szogunn.demonextdoorbook.payloads.SignupRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,4 +12,8 @@ public interface UserController {
 
     @PostMapping(path = "/signup")
     ResponseEntity<String> signUp(@RequestBody SignupRequest signupRequest);
+
+    @PostMapping(path = "/login")
+    ResponseEntity<String> login(@RequestBody LoginRequest loginRequest);
+
 }

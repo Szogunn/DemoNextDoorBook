@@ -1,6 +1,7 @@
 package com.szogunn.demonextdoorbook.controllersImpl;
 
 import com.szogunn.demonextdoorbook.controllers.UserController;
+import com.szogunn.demonextdoorbook.payloads.LoginRequest;
 import com.szogunn.demonextdoorbook.payloads.SignupRequest;
 import com.szogunn.demonextdoorbook.services.UserService;
 import org.springframework.http.HttpStatus;
@@ -25,5 +26,17 @@ public class UserControllerImpl implements UserController {
         }
 
         return new ResponseEntity<>("{\"message\":\"Something went wrong\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> login(LoginRequest loginRequest) {
+        try {
+            return userService.logIn(loginRequest);
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        return new ResponseEntity<>("{\"message\":\"Something went wrong\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+
     }
 }

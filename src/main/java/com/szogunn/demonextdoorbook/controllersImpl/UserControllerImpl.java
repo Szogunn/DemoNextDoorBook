@@ -18,7 +18,7 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    public ResponseEntity<String> signUp(SignupRequest signupRequest) {
+    public ResponseEntity<?> signUp(SignupRequest signupRequest) {
         try {
             return userService.signUp(signupRequest);
         } catch (Exception ex){
@@ -39,4 +39,5 @@ public class UserControllerImpl implements UserController {
         return new ResponseEntity<>("{\"message\":\"Something went wrong\"}", HttpStatus.INTERNAL_SERVER_ERROR);
 
     }
+
 }

@@ -33,24 +33,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<String> signUp(SignupRequest signupRequest) {
+    public ResponseEntity<?> signUp(SignupRequest signupRequest) {
         if (userRepository.existsUserByEmail(signupRequest.email())){
             return new ResponseEntity<>("Error: Email is already taken", HttpStatus.BAD_REQUEST);
         }
 
-        userRepository.save(new User(signupRequest.login()
-                ,encoder.encode(signupRequest.password())
-                ,signupRequest.email()
-                ,signupRequest.address()));
-        return new ResponseEntity<>("Successfully Registered", HttpStatus.OK);
+        User savedUser = userRepository.save(new User(signupRequest.login()
+                , encoder.encode(signupRequest.password())
+                , signupRequest.email()
+                , signupRequest.address()));
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<String> logIn(LoginRequest loginRequest) {
-        Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()));
+        Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.login(), loginRequest.password()));
         SecurityContextHolder.getContext().setAuthentication(auth);
-        String token = jwtUtils.generateToken(loginRequest.username());
-        return new ResponseEntity<>("{\"message\":\"token:\"}" + token, HttpStatus.OK);
+        String token = jwtUtils.generateToken(loginRequest.login());
+        return new ResponseEntity<>(token, HttpStatus.OK);
     }
 
 }

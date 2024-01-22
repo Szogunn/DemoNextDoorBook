@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface UserController {
 
     @PostMapping(path = "/signup")
-    ResponseEntity<String> signUp(@RequestBody SignupRequest signupRequest);
+    ResponseEntity<?> signUp(@RequestBody SignupRequest signupRequest);
 
     @PostMapping(path = "/login")
     ResponseEntity<String> login(@RequestBody LoginRequest loginRequest);

@@ -14,6 +14,6 @@ public interface UserController {
     ResponseEntity<?> signUp(@RequestBody SignupRequest signupRequest);
 
     @PostMapping(path = "/login")
-    ResponseEntity<String> login(@RequestBody LoginRequest loginRequest);
+    ResponseEntity<?> login(@RequestBody LoginRequest loginRequest);
 
 }

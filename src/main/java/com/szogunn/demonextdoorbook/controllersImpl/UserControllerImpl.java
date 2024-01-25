@@ -2,10 +2,12 @@ package com.szogunn.demonextdoorbook.controllersImpl;
 
 import com.szogunn.demonextdoorbook.controllers.UserController;
 import com.szogunn.demonextdoorbook.payloads.LoginRequest;
+import com.szogunn.demonextdoorbook.payloads.MessageResponse;
 import com.szogunn.demonextdoorbook.payloads.SignupRequest;
 import com.szogunn.demonextdoorbook.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -29,14 +31,14 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    public ResponseEntity<String> login(LoginRequest loginRequest) {
+    public ResponseEntity<?> login(LoginRequest loginRequest) {
         try {
             return userService.logIn(loginRequest);
         } catch (Exception ex){
             ex.printStackTrace();
         }
 
-        return new ResponseEntity<>("{\"message\":\"Something went wrong\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new MessageResponse("Something went wrong!!!"), HttpStatus.INTERNAL_SERVER_ERROR);
 
     }
 

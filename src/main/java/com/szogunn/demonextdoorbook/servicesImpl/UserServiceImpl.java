@@ -43,8 +43,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(new User(signupRequest.login()
                 , encoder.encode(signupRequest.password())
-                , signupRequest.email()
-                , signupRequest.address()));
+                , signupRequest.email()));
         return new ResponseEntity<>(new MessageResponse("User registered successfully!"), HttpStatus.CREATED);
     }
 

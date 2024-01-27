@@ -19,12 +19,10 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<Book> books;
 
-    public User(String login, String password, String email, Address address) {
+    public User(String login, String password, String email) {
         this.login = login;
         this.password = password;
         this.email = email;
-        this.address = address;
-        this.books = new HashSet<>();
     }
 
     public User() {

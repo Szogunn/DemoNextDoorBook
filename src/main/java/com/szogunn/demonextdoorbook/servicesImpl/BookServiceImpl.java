@@ -1,6 +1,7 @@
 package com.szogunn.demonextdoorbook.servicesImpl;
 
 import com.szogunn.demonextdoorbook.dtos.BookDTO;
+import com.szogunn.demonextdoorbook.jwt.UserDetailsImpl;
 import com.szogunn.demonextdoorbook.model.Book;
 import com.szogunn.demonextdoorbook.model.User;
 import com.szogunn.demonextdoorbook.payloads.MessageResponse;
@@ -11,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -39,5 +43,13 @@ public class BookServiceImpl implements BookService {
         bookRepository.save(book);
 
         return new ResponseEntity<>(new MessageResponse("Book has been Added"), HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<?> showAllBooks(UserDetailsImpl userDetails) {
+        List<Book> books = bookRepository.findBooksByUserId(userDetails.getId());
+        Stream<BookDTO> userBooks = books.stream()
+                .map(book -> new BookDTO(book.getTittle(), book.getISBN(), book.getNumPages(), book.getLanguage(), book.getPublisher(), book.getPublishedYear(), book.getAuthors()));
+        return new ResponseEntity<>(userBooks, HttpStatus.OK);
     }
 }

@@ -32,7 +32,7 @@ public class BookServiceImpl implements BookService {
         User user = userRepository.findUserByLogin(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with login: " + username));
         Book book = new Book();
         book.setISBN(bookDTO.ISBN());
-        book.setTittle(bookDTO.tittle());
+        book.setTitle(bookDTO.tittle());
         book.setLanguage(bookDTO.language());
         book.setNumPages(bookDTO.numPages());
         book.setPublishedYear(bookDTO.publishedYear());
@@ -49,7 +49,7 @@ public class BookServiceImpl implements BookService {
     public ResponseEntity<?> showAllBooks(UserDetailsImpl userDetails) {
         List<Book> books = bookRepository.findBooksByUserId(userDetails.getId());
         Stream<BookDTO> userBooks = books.stream()
-                .map(book -> new BookDTO(book.getTittle(), book.getISBN(), book.getNumPages(), book.getLanguage(), book.getPublisher(), book.getPublishedYear(), book.getAuthors()));
+                .map(book -> new BookDTO(book.getTitle(), book.getISBN(), book.getNumPages(), book.getLanguage(), book.getPublisher(), book.getPublishedYear(), book.getAuthors()));
         return new ResponseEntity<>(userBooks, HttpStatus.OK);
     }
 }

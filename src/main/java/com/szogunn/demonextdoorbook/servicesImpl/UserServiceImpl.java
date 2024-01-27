@@ -37,8 +37,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<?> signUp(SignupRequest signupRequest) {
-        if (userRepository.existsUserByEmail(signupRequest.email())){
-            return new ResponseEntity<>(new MessageResponse("Error: Email is already taken"), HttpStatus.BAD_REQUEST);
+        if (userRepository.existsUserByEmailOrLogin(signupRequest.email(), signupRequest.login())){
+            return new ResponseEntity<>(new MessageResponse("Error: Email or login is already taken"), HttpStatus.BAD_REQUEST);
         }
 
         userRepository.save(new User(signupRequest.login()

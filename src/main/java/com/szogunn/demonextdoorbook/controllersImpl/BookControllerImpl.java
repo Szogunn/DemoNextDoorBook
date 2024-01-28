@@ -35,4 +35,10 @@ public class BookControllerImpl implements BookController {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return bookService.showAllBooks(userDetails);
     }
+
+    @Override
+    public ResponseEntity<?> showNeighboursBooks() {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return bookService.showNeighboursBooks(userDetails);
+    }
 }

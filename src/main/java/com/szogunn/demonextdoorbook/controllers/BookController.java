@@ -17,4 +17,6 @@ public interface BookController {
     ResponseEntity<?> addBook(@RequestBody BookDTO bookDTO, Authentication authentication);
     @GetMapping(path = "/show")
     ResponseEntity<List<BookDTO>> showAllBooks();
+    @GetMapping(path = "/showNeighbours")
+    ResponseEntity<?> showNeighboursBooks();
 }

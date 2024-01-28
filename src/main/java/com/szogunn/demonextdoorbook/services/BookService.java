@@ -10,4 +10,5 @@ public interface BookService {
     ResponseEntity<?> addBook(BookDTO bookDTO, String username);
 
     ResponseEntity<List<BookDTO>> showAllBooks(UserDetailsImpl userDetails);
+    ResponseEntity<List<BookDTO>> showNeighboursBooks(UserDetailsImpl userDetails);
 }

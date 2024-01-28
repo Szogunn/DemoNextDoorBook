@@ -8,11 +8,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
+
 @RequestMapping("/book")
 public interface BookController {
 
     @PostMapping(path = "/add")
     ResponseEntity<?> addBook(@RequestBody BookDTO bookDTO, Authentication authentication);
     @GetMapping(path = "/show")
-    ResponseEntity<?> showAllBooks();
+    ResponseEntity<List<BookDTO>> showAllBooks();
 }

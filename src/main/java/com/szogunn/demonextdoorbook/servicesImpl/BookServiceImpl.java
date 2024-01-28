@@ -46,10 +46,11 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public ResponseEntity<?> showAllBooks(UserDetailsImpl userDetails) {
+    public ResponseEntity<List<BookDTO>> showAllBooks(UserDetailsImpl userDetails) {
         List<Book> books = bookRepository.findBooksByUserId(userDetails.getId());
-        Stream<BookDTO> userBooks = books.stream()
-                .map(book -> new BookDTO(book.getTitle(), book.getISBN(), book.getNumPages(), book.getLanguage(), book.getPublisher(), book.getPublishedYear(), book.getAuthors()));
+        List<BookDTO> userBooks = books.stream()
+                .map(book -> new BookDTO(book.getTitle(), book.getISBN(), book.getNumPages(), book.getLanguage(), book.getPublisher(), book.getPublishedYear(), book.getAuthors()))
+                .toList();
         return new ResponseEntity<>(userBooks, HttpStatus.OK);
     }
 }

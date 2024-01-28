@@ -11,6 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
+
 @Controller
 public class BookControllerImpl implements BookController {
     private final BookService bookService;
@@ -29,7 +31,7 @@ public class BookControllerImpl implements BookController {
     }
 
     @Override
-    public ResponseEntity<?> showAllBooks() {
+    public ResponseEntity<List<BookDTO>> showAllBooks() {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return bookService.showAllBooks(userDetails);
     }

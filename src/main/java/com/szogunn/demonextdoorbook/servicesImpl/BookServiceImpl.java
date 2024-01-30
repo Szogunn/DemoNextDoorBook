@@ -65,8 +65,8 @@ public class BookServiceImpl implements BookService {
     @Override
     public ResponseEntity<List<BookDTO>> showNeighboursBooks(UserDetailsImpl userDetails) {
         Long userId = userDetails.getId();
-        List<BookDTO> neighboursBooks = bookRepository.findAll().stream()
-                .filter(book -> !book.getOwner().getId().equals(userId))
+        List<BookDTO> neighboursBooks = bookRepository.findAll().stream()//nie może być tak że pobieram całą baze danych. Są to zbędne dane z perspektywy programu. Być może skorzystać z wczytywania z bazy danych skolejkowanego
+                .filter(book -> !book.getOwner().getId().equals(userId)) //TODO do poprawienia, na podstawie np filtra odległościowego będą wczytywane te książki których właścieciele są odpowiednio blisko. Wcześniej trzeba zaimplementować uzupełnienie profilu o adres
                 .map(book -> new BookDTO.Builder()
                         .id(book.getId())
                         .title(book.getTitle())

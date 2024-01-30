@@ -1,8 +1,6 @@
 package com.szogunn.demonextdoorbook.dtos;
 
 import com.szogunn.demonextdoorbook.model.Author;
-import com.szogunn.demonextdoorbook.model.Book;
-import com.szogunn.demonextdoorbook.model.User;
 
 import java.time.LocalDate;
 import java.util.Set;

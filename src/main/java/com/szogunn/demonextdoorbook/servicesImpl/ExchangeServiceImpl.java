@@ -18,13 +18,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ExchangeServiceImpl implements ExchangeService {
 
     private final BookRepository bookRepository;
-
     private final ExchangeRepository exchangeRepository;
     private final UserRepository userRepository;
 
@@ -35,15 +35,30 @@ public class ExchangeServiceImpl implements ExchangeService {
     }
 
     @Override
-    public ResponseEntity<?> exchange(BookDTO bookDTO) {
+    public ResponseEntity<?> exchange(Long bookId, LocalDate endRent) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepository.findUserByLogin(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with login: " + userDetails.getUsername()));
-        Optional<Book> book = bookRepository.findById(bookDTO.id());
-        if (book.isPresent()) {
-            Exchange exchange = new Exchange(user, book.get(), LocalDate.now(), LocalDate.now().plusDays(5));
+        Optional<Book> optionalBook = bookRepository.findById(bookId);
+        List<Exchange> bookExchanges = exchangeRepository.findExchangeByBook_IdAndEndRentAfter(bookId, LocalDate.now());
+        if (optionalBook.isPresent() && bookExchanges.isEmpty()) {
+            Book book = optionalBook.get();
+            Exchange exchange = new Exchange(user, book, LocalDate.now(), endRent);
             exchangeRepository.save(exchange);
-            ExchangeDTO exchangeDTO = new ExchangeDTO(bookDTO, LocalDate.now(), LocalDate.now().plusDays(5));
+            ExchangeDTO exchangeDTO = new ExchangeDTO(new BookDTO.Builder()
+                    .id(book.getId())
+                    .title(book.getTitle())
+                    .ISBN(book.getISBN())
+                    .numPages(book.getNumPages())
+                    .language(book.getLanguage())
+                    .publisher(book.getPublisher())
+                    .publishedYear(book.getPublishedYear())
+                    .authors(book.getAuthors())
+                    .owner(book.getOwner().getLogin()).build()
+                    , LocalDate.now()
+                    , endRent);
             return new ResponseEntity<>(exchangeDTO, HttpStatus.OK);
+        } else if (!bookExchanges.isEmpty()){
+            return new ResponseEntity<>(new MessageResponse("Book has been already borrower by another User"), HttpStatus.CONFLICT);
         }
 
         return new ResponseEntity<>(new MessageResponse("smth went wrong"), HttpStatus.BAD_REQUEST);

@@ -1,13 +1,13 @@
 package com.szogunn.demonextdoorbook.controllersImpl;
 
 import com.szogunn.demonextdoorbook.controllers.UserController;
+import com.szogunn.demonextdoorbook.dtos.AddressDTO;
 import com.szogunn.demonextdoorbook.payloads.LoginRequest;
 import com.szogunn.demonextdoorbook.payloads.MessageResponse;
 import com.szogunn.demonextdoorbook.payloads.SignupRequest;
 import com.szogunn.demonextdoorbook.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -40,6 +40,11 @@ public class UserControllerImpl implements UserController {
 
         return new ResponseEntity<>(new MessageResponse("Something went wrong!!!"), HttpStatus.INTERNAL_SERVER_ERROR);
 
+    }
+
+    @Override
+    public ResponseEntity<?> addAddress(AddressDTO addressDTO) {
+        return userService.addAddress(addressDTO);
     }
 
 }

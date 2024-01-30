@@ -1,5 +1,6 @@
 package com.szogunn.demonextdoorbook.controllers;
 
+import com.szogunn.demonextdoorbook.dtos.AddressDTO;
 import com.szogunn.demonextdoorbook.payloads.LoginRequest;
 import com.szogunn.demonextdoorbook.payloads.SignupRequest;
 import org.springframework.http.ResponseEntity;
@@ -15,5 +16,8 @@ public interface UserController {
 
     @PostMapping(path = "/login")
     ResponseEntity<?> login(@RequestBody LoginRequest loginRequest);
+
+    @PostMapping(path = "/add-address")
+    ResponseEntity<?> addAddress(@RequestBody AddressDTO addressDTO);
 
 }

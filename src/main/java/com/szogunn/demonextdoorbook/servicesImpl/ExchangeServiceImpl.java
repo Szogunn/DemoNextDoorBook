@@ -1,20 +1,19 @@
 package com.szogunn.demonextdoorbook.servicesImpl;
 
-import com.szogunn.demonextdoorbook.dtos.BookDTO;
 import com.szogunn.demonextdoorbook.dtos.ExchangeDTO;
-import com.szogunn.demonextdoorbook.jwt.UserDetailsImpl;
+import com.szogunn.demonextdoorbook.mappers.Mapper;
+import com.szogunn.demonextdoorbook.mappers.MapperFactory;
 import com.szogunn.demonextdoorbook.model.Book;
 import com.szogunn.demonextdoorbook.model.Exchange;
 import com.szogunn.demonextdoorbook.model.User;
 import com.szogunn.demonextdoorbook.payloads.MessageResponse;
+import com.szogunn.demonextdoorbook.payloads.Response;
 import com.szogunn.demonextdoorbook.repositories.BookRepository;
 import com.szogunn.demonextdoorbook.repositories.ExchangeRepository;
-import com.szogunn.demonextdoorbook.repositories.UserRepository;
 import com.szogunn.demonextdoorbook.services.ExchangeService;
+import com.szogunn.demonextdoorbook.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -26,41 +25,47 @@ public class ExchangeServiceImpl implements ExchangeService {
 
     private final BookRepository bookRepository;
     private final ExchangeRepository exchangeRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
+    private final MapperFactory mapperFactory;
 
-    public ExchangeServiceImpl(BookRepository bookRepository, ExchangeRepository exchangeRepository, UserRepository userRepository) {
+    public ExchangeServiceImpl(BookRepository bookRepository, ExchangeRepository exchangeRepository, UserService userService, MapperFactory mapperFactory) {
         this.bookRepository = bookRepository;
         this.exchangeRepository = exchangeRepository;
-        this.userRepository = userRepository;
+        this.userService = userService;
+        this.mapperFactory = mapperFactory;
     }
 
     @Override
     public ResponseEntity<?> exchange(Long bookId, LocalDate endRent) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userRepository.findUserByLogin(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with login: " + userDetails.getUsername()));
+        User user = userService.getAuthenticatedUser();
         Optional<Book> optionalBook = bookRepository.findById(bookId);
         List<Exchange> bookExchanges = exchangeRepository.findExchangeByBook_IdAndEndRentAfter(bookId, LocalDate.now());
+
         if (optionalBook.isPresent() && bookExchanges.isEmpty()) {
-            Book book = optionalBook.get();
-            Exchange exchange = new Exchange(user, book, LocalDate.now(), endRent);
+            Exchange exchange = new Exchange(user, optionalBook.get(), LocalDate.now(), endRent);
             exchangeRepository.save(exchange);
-            ExchangeDTO exchangeDTO = new ExchangeDTO(new BookDTO.Builder()
-                    .id(book.getId())
-                    .title(book.getTitle())
-                    .ISBN(book.getISBN())
-                    .numPages(book.getNumPages())
-                    .language(book.getLanguage())
-                    .publisher(book.getPublisher())
-                    .publishedYear(book.getPublishedYear())
-                    .authors(book.getAuthors())
-                    .owner(book.getOwner().getLogin()).build()
-                    , LocalDate.now()
-                    , endRent);
-            return new ResponseEntity<>(exchangeDTO, HttpStatus.OK);
-        } else if (!bookExchanges.isEmpty()){
+
+            Mapper<Exchange, ExchangeDTO> mapper = mapperFactory.getMapper(Exchange.class, ExchangeDTO.class);
+            if (mapper != null) {
+                ExchangeDTO exchangeDTO = mapper.map(exchange);
+                return new ResponseEntity<>(new Response<>(exchangeDTO, "The Exchange was successful"), HttpStatus.CREATED);
+            }
+
+        } else if (!bookExchanges.isEmpty()) {
             return new ResponseEntity<>(new MessageResponse("Book has been already borrower by another User"), HttpStatus.CONFLICT);
         }
 
         return new ResponseEntity<>(new MessageResponse("smth went wrong"), HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    public ResponseEntity<?> getUserBooksRentalHistory() {
+        User user = userService.getAuthenticatedUser();
+        List<Exchange> userBooksExchanged = exchangeRepository.findExchangesByRenter_IdOrBook_User_Id(user.getId(), user.getId());
+        Mapper<Exchange, ExchangeDTO> mapper = mapperFactory.getMapper(Exchange.class, ExchangeDTO.class);
+        List<ExchangeDTO> exchangeDTOList = userBooksExchanged.stream()
+                .map(mapper::map)
+                .toList();
+        return new ResponseEntity<>(exchangeDTOList, HttpStatus.OK);
     }
 }

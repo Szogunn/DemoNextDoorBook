@@ -17,4 +17,9 @@ public class ExchangeControllerImpl implements ExchangeController {
     public ResponseEntity<?> exchange(RentalRequest rentalRequest) {
         return exchangeService.exchange(rentalRequest.id(), rentalRequest.endRent());
     }
+
+    @Override
+    public ResponseEntity<?> getUserBooksRentalHistory() {
+        return exchangeService.getUserBooksRentalHistory();
+    }
 }

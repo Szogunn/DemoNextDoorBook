@@ -11,4 +11,5 @@ public interface BookService {
 
     ResponseEntity<List<BookDTO>> showAllBooks(UserDetailsImpl userDetails);
     ResponseEntity<List<BookDTO>> showNeighboursBooks(UserDetailsImpl userDetails);
+    ResponseEntity<?> getBook(Long bookId);
 }

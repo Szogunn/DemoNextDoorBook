@@ -41,4 +41,9 @@ public class BookControllerImpl implements BookController {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return bookService.showNeighboursBooks(userDetails);
     }
+
+    @Override
+    public ResponseEntity<?> getBook(Long bookId) {
+        return bookService.getBook(bookId);
+    }
 }

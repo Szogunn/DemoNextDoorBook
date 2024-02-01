@@ -6,6 +6,5 @@ public record ExchangeDTO(
         BookDTO bookDTO,
         LocalDate startRent,
         LocalDate endRent
-
 ) {
 }

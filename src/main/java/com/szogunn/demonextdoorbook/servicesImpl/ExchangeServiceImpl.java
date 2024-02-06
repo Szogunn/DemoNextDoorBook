@@ -42,7 +42,7 @@ public class ExchangeServiceImpl implements ExchangeService {
         Optional<Book> optionalBook = bookRepository.findById(bookId);
         List<Exchange> bookExchanges = exchangeRepository.findExchangeByBook_IdAndEndRentAfter(bookId, LocalDate.now());
 
-        if (optionalBook.isPresent() && bookExchanges.isEmpty()) {
+        if (optionalBook.isPresent() && bookExchanges.isEmpty() && !isUserOwnTheBook(user, optionalBook.get())) {
             Exchange exchange = new Exchange(user, optionalBook.get(), LocalDate.now(), endRent);
             exchangeRepository.save(exchange);
 
@@ -60,7 +60,7 @@ public class ExchangeServiceImpl implements ExchangeService {
     public ResponseEntity<?> changeExchangeStatus(Long exchangeId, ExchangeStatus newStatus) {
         User user = userService.getAuthenticatedUser();
         Optional<Exchange> optionalExchange = exchangeRepository.findById(exchangeId);
-        if (optionalExchange.isPresent() && optionalExchange.get().getBook().getOwner().equals(user)){
+        if (optionalExchange.isPresent() && isUserOwnTheBook(user, optionalExchange.get().getBook())){
             Exchange exchange = optionalExchange.get();
 
             ExchangeStatus exchangeStatus = exchange.getStatus();
@@ -83,5 +83,9 @@ public class ExchangeServiceImpl implements ExchangeService {
                 .map(exchangeMapper::map)
                 .toList();
         return new ResponseEntity<>(exchangeDTOList, HttpStatus.OK);
+    }
+
+    private boolean isUserOwnTheBook(User user, Book book){
+        return book.getOwner().equals(user);
     }
 }

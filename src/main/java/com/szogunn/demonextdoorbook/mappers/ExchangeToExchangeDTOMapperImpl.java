@@ -15,9 +15,11 @@ public class ExchangeToExchangeDTOMapperImpl implements Mapper<Exchange, Exchang
     public ExchangeDTO map(Exchange source) {
         Book book = source.getBook();
         User user = book.getOwner();
+        User renter = source.getRenter();
         UserDTO userDTO = new UserDTO(user.getId(), user.getLogin());
         BookDTO bookDTO = new BookDTO(book.getId(), book.getTitle(), book.getISBN(), book.getNumPages(), book.getLanguage(), book.getPublisher(), book.getPublishedYear(), userDTO);
+        UserDTO renterDTO = new UserDTO(renter.getId(), renter.getLogin());
 
-        return new ExchangeDTO(bookDTO, source.getStartRent(), source.getEndRent());
+        return new ExchangeDTO(source.getId(), bookDTO, source.getStartRent(), source.getEndRent(), source.getStatus(),renterDTO);
     }
 }

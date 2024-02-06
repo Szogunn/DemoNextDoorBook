@@ -5,6 +5,7 @@ import com.szogunn.demonextdoorbook.mappers.Mapper;
 import com.szogunn.demonextdoorbook.mappers.MapperFactory;
 import com.szogunn.demonextdoorbook.model.Book;
 import com.szogunn.demonextdoorbook.model.Exchange;
+import com.szogunn.demonextdoorbook.model.ExchangeStatus;
 import com.szogunn.demonextdoorbook.model.User;
 import com.szogunn.demonextdoorbook.payloads.MessageResponse;
 import com.szogunn.demonextdoorbook.payloads.Response;
@@ -26,13 +27,13 @@ public class ExchangeServiceImpl implements ExchangeService {
     private final BookRepository bookRepository;
     private final ExchangeRepository exchangeRepository;
     private final UserService userService;
-    private final MapperFactory mapperFactory;
+    private final Mapper<Exchange, ExchangeDTO> exchangeMapper;
 
     public ExchangeServiceImpl(BookRepository bookRepository, ExchangeRepository exchangeRepository, UserService userService, MapperFactory mapperFactory) {
         this.bookRepository = bookRepository;
         this.exchangeRepository = exchangeRepository;
         this.userService = userService;
-        this.mapperFactory = mapperFactory;
+        this.exchangeMapper = mapperFactory.getMapper(Exchange.class, ExchangeDTO.class);
     }
 
     @Override
@@ -45,11 +46,8 @@ public class ExchangeServiceImpl implements ExchangeService {
             Exchange exchange = new Exchange(user, optionalBook.get(), LocalDate.now(), endRent);
             exchangeRepository.save(exchange);
 
-            Mapper<Exchange, ExchangeDTO> mapper = mapperFactory.getMapper(Exchange.class, ExchangeDTO.class);
-            if (mapper != null) {
-                ExchangeDTO exchangeDTO = mapper.map(exchange);
-                return new ResponseEntity<>(new Response<>(exchangeDTO, "The Exchange was successful"), HttpStatus.CREATED);
-            }
+            ExchangeDTO exchangeDTO = exchangeMapper.map(exchange);
+            return new ResponseEntity<>(new Response<>(exchangeDTO, "The Exchange was successful"), HttpStatus.CREATED);
 
         } else if (!bookExchanges.isEmpty()) {
             return new ResponseEntity<>(new MessageResponse("Book has been already borrower by another User"), HttpStatus.CONFLICT);
@@ -59,12 +57,30 @@ public class ExchangeServiceImpl implements ExchangeService {
     }
 
     @Override
-    public ResponseEntity<?> getUserBooksRentalHistory() {
+    public ResponseEntity<?> changeExchangeStatus(Long exchangeId, ExchangeStatus newStatus) {
         User user = userService.getAuthenticatedUser();
-        List<Exchange> userBooksExchanged = exchangeRepository.findExchangesByRenter_IdOrBook_User_Id(user.getId(), user.getId());
-        Mapper<Exchange, ExchangeDTO> mapper = mapperFactory.getMapper(Exchange.class, ExchangeDTO.class);
+        Optional<Exchange> optionalExchange = exchangeRepository.findById(exchangeId);
+        if (optionalExchange.isPresent() && optionalExchange.get().getBook().getOwner().equals(user)){
+            Exchange exchange = optionalExchange.get();
+
+            ExchangeStatus exchangeStatus = exchange.getStatus();
+            if (exchangeStatus.equals(ExchangeStatus.PENDING) && (newStatus.equals(ExchangeStatus.ACCEPTED) || newStatus.equals(ExchangeStatus.REJECTED))){
+                exchange.setStatus(newStatus);
+                exchangeRepository.save(exchange);
+
+                ExchangeDTO exchangeDTO = exchangeMapper.map(exchange);
+                return new ResponseEntity<>(new Response(exchangeDTO, "Status has changed"), HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(new MessageResponse("smth went wrong"), HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    public ResponseEntity<List<ExchangeDTO>> getUserBooksRentalHistory(ExchangeStatus [] statuses) {
+        User user = userService.getAuthenticatedUser();
+        List<Exchange> userBooksExchanged = exchangeRepository.findExchangesByBook_User_IdAndStatusIsIn(user.getId(), statuses);
         List<ExchangeDTO> exchangeDTOList = userBooksExchanged.stream()
-                .map(mapper::map)
+                .map(exchangeMapper::map)
                 .toList();
         return new ResponseEntity<>(exchangeDTOList, HttpStatus.OK);
     }

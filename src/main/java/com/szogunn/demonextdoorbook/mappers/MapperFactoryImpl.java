@@ -16,6 +16,7 @@ public class MapperFactoryImpl implements MapperFactory {
         mapperRegistry.put("BookToBookDTOMapperImpl" , new BookToBookDTOMapperImpl());
         mapperRegistry.put("UserToUserDTOMapperImpl" , new UserToUserDTOMapperImpl());
         mapperRegistry.put("ExchangeToExchangeDTOMapperImpl" , new ExchangeToExchangeDTOMapperImpl());
+        mapperRegistry.put("AddressToAddressDTOMapperImpl" , new AddressToAddressDTOMapperImpl());
     }
 
     @SuppressWarnings(value = "unchecked")

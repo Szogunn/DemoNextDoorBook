@@ -12,4 +12,5 @@ public interface UserService {
     ResponseEntity<?> logIn(LoginRequest loginRequest);
     ResponseEntity<?> addAddress(AddressDTO addressDTO);
     User getAuthenticatedUser();
+    ResponseEntity<?> getUserProfile(Long userId);
 }

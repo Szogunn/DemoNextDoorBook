@@ -1,12 +1,18 @@
 package com.szogunn.demonextdoorbook.servicesImpl;
 
 import com.szogunn.demonextdoorbook.dtos.AddressDTO;
+import com.szogunn.demonextdoorbook.dtos.UserDTO;
 import com.szogunn.demonextdoorbook.jwt.JwtUtils;
 import com.szogunn.demonextdoorbook.jwt.UserDetailsImpl;
+import com.szogunn.demonextdoorbook.mappers.Mapper;
+import com.szogunn.demonextdoorbook.mappers.MapperFactory;
 import com.szogunn.demonextdoorbook.model.Address;
+import com.szogunn.demonextdoorbook.model.Exchange;
+import com.szogunn.demonextdoorbook.model.ExchangeStatus;
 import com.szogunn.demonextdoorbook.model.User;
 import com.szogunn.demonextdoorbook.payloads.*;
 import com.szogunn.demonextdoorbook.repositories.AddressRepository;
+import com.szogunn.demonextdoorbook.repositories.ExchangeRepository;
 import com.szogunn.demonextdoorbook.repositories.UserRepository;
 import com.szogunn.demonextdoorbook.services.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +27,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -33,13 +38,19 @@ public class UserServiceImpl implements UserService {
     private final JwtUtils jwtUtils;
     private final PasswordEncoder encoder;
     private final AddressRepository addressRepository;
+    private final ExchangeRepository exchangeRepository;
+    private final Mapper<User, UserDTO> userDTOMapper;
+    private final Mapper<Address, AddressDTO> addressDTOMapper;
 
-    public UserServiceImpl(UserRepository userRepository, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder encoder, AddressRepository addressRepository) {
+    public UserServiceImpl(UserRepository userRepository, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder encoder, AddressRepository addressRepository, ExchangeRepository exchangeRepository, MapperFactory mapperFactory) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.encoder = encoder;
         this.addressRepository = addressRepository;
+        this.exchangeRepository = exchangeRepository;
+        this.userDTOMapper = mapperFactory.getMapper(User.class, UserDTO.class);
+        this.addressDTOMapper = mapperFactory.getMapper(Address.class, AddressDTO.class);
     }
 
     @Override
@@ -94,6 +105,39 @@ public class UserServiceImpl implements UserService {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         final UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         return userRepository.findById(userDetails.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with login: " + userDetails.getUsername()));
+    }
+
+    @Override
+    public ResponseEntity<?> getUserProfile(Long userId) {
+        User authenticatedUser = getAuthenticatedUser();
+        List<Exchange> proceed = exchangeRepository.findExchangesBetweenUsersInStatus(userId, authenticatedUser.getId(), ExchangeStatus.ACCEPTED);
+        Optional<User> optionalUser = userRepository.findById(userId);
+
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            Map<String, Object> result = new HashMap<>();
+            UserDTO userDTO = userDTOMapper.map(user);
+            result.put("userDTO", userDTO);
+
+            List<Exchange> lentBooks = exchangeRepository.findExchangesByRenter_IdAndStatusIsIn(userId, new ExchangeStatus[]{ExchangeStatus.ACCEPTED});
+            List<Exchange> borrowedBooks = exchangeRepository.findExchangesByBook_User_IdAndStatusIsIn(userId, new ExchangeStatus[]{ExchangeStatus.ACCEPTED});
+            int bookAmount = user.getBooks().size();
+            int booksBorrowedAmount = borrowedBooks.size();
+            int booksLentAmount = lentBooks.size();
+            result.put("bookAmount", bookAmount);
+            result.put("booksBorrowedAmount", booksBorrowedAmount);
+            result.put("booksLentAmount", booksLentAmount);
+
+            if (!proceed.isEmpty() && user.getAddress() != null) {
+                AddressDTO addressDTO = addressDTOMapper.map(user.getAddress());
+                result.put("addressDTO", addressDTO);
+                return new ResponseEntity<>(result, HttpStatus.OK);
+            }
+
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(new MessageResponse("Smth went wrong"), HttpStatus.BAD_REQUEST);
     }
 
 }

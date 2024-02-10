@@ -4,9 +4,7 @@ import com.szogunn.demonextdoorbook.dtos.AddressDTO;
 import com.szogunn.demonextdoorbook.payloads.LoginRequest;
 import com.szogunn.demonextdoorbook.payloads.SignupRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/user")
 public interface UserController {
@@ -19,5 +17,8 @@ public interface UserController {
 
     @PostMapping(path = "/add-address")
     ResponseEntity<?> addAddress(@RequestBody AddressDTO addressDTO);
+
+    @GetMapping(path = "/{userId}")
+    ResponseEntity<?> getUserProfile(@PathVariable Long userId);
 
 }

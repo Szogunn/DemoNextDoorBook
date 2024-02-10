@@ -47,4 +47,9 @@ public class UserControllerImpl implements UserController {
         return userService.addAddress(addressDTO);
     }
 
+    @Override
+    public ResponseEntity<?> getUserProfile(Long userId) {
+        return userService.getUserProfile(userId);
+    }
+
 }

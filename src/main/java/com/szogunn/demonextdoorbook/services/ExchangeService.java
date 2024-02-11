@@ -12,4 +12,5 @@ public interface ExchangeService {
     ResponseEntity<?> exchange(Long bookId, LocalDate endRent);
     ResponseEntity<?> changeExchangeStatus(Long exchangeId, ExchangeStatus newStatus);
     ResponseEntity<List<ExchangeDTO>> getUserBooksRentalHistory(ExchangeStatus [] statuses);
+    ResponseEntity<?> rateExchange(double rate, Long exchangeId);
 }

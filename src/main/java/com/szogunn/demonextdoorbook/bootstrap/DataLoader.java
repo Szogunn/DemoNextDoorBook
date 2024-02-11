@@ -80,6 +80,7 @@ public class DataLoader implements CommandLineRunner {
         createMoreDate();
 
         createExchanges(user1, book4);
+        createExchanges(user1, book3);
     }
 
     private void createExchanges(User user, Book book){

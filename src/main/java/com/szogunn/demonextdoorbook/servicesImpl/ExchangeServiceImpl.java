@@ -3,10 +3,7 @@ package com.szogunn.demonextdoorbook.servicesImpl;
 import com.szogunn.demonextdoorbook.dtos.ExchangeDTO;
 import com.szogunn.demonextdoorbook.mappers.Mapper;
 import com.szogunn.demonextdoorbook.mappers.MapperFactory;
-import com.szogunn.demonextdoorbook.model.Book;
-import com.szogunn.demonextdoorbook.model.Exchange;
-import com.szogunn.demonextdoorbook.model.ExchangeStatus;
-import com.szogunn.demonextdoorbook.model.User;
+import com.szogunn.demonextdoorbook.model.*;
 import com.szogunn.demonextdoorbook.payloads.MessageResponse;
 import com.szogunn.demonextdoorbook.payloads.Response;
 import com.szogunn.demonextdoorbook.repositories.BookRepository;
@@ -26,7 +23,9 @@ public class ExchangeServiceImpl implements ExchangeService {
 
     private final BookRepository bookRepository;
     private final ExchangeRepository exchangeRepository;
+
     private final UserService userService;
+
     private final Mapper<Exchange, ExchangeDTO> exchangeMapper;
 
     public ExchangeServiceImpl(BookRepository bookRepository, ExchangeRepository exchangeRepository, UserService userService, MapperFactory mapperFactory) {
@@ -69,7 +68,7 @@ public class ExchangeServiceImpl implements ExchangeService {
                 exchangeRepository.save(exchange);
 
                 ExchangeDTO exchangeDTO = exchangeMapper.map(exchange);
-                return new ResponseEntity<>(new Response(exchangeDTO, "Status has changed"), HttpStatus.OK);
+                return new ResponseEntity<>(new Response<>(exchangeDTO, "Status has changed"), HttpStatus.OK);
             }
         }
         return new ResponseEntity<>(new MessageResponse("smth went wrong"), HttpStatus.BAD_REQUEST);
@@ -83,6 +82,23 @@ public class ExchangeServiceImpl implements ExchangeService {
                 .map(exchangeMapper::map)
                 .toList();
         return new ResponseEntity<>(exchangeDTOList, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<?> rateExchange(double rateValue, Long exchangeId) {
+        User user = userService.getAuthenticatedUser();
+        Optional<Exchange> optionalExchange = exchangeRepository.findById(exchangeId);
+        Rate rate = Rate.findByValue(rateValue);
+
+        if (optionalExchange.isPresent() && optionalExchange.get().getStatus().equals(ExchangeStatus.ENDED) && optionalExchange.get().getRate() == null && rate!= null && isUserOwnTheBook(user, optionalExchange.get().getBook())){
+            Exchange exchange = optionalExchange.get();
+            exchange.setRate(rate);
+            exchangeRepository.save(exchange);
+            ExchangeDTO exchangeDTO = exchangeMapper.map(exchange);
+            return new ResponseEntity<>(new Response<>(exchangeDTO, "Rate Added Successfully"), HttpStatus.CREATED);
+        }
+
+        return new ResponseEntity<>(new MessageResponse("Smth went wrong"), HttpStatus.BAD_REQUEST);
     }
 
     private boolean isUserOwnTheBook(User user, Book book){

@@ -17,4 +17,6 @@ public interface ExchangeController {
     ResponseEntity<List<ExchangeDTO>> getUserBooksRentalHistory(@RequestParam("statuses") ExchangeStatus [] statuses);
     @PostMapping(path = "/update-status/{id}")
     ResponseEntity<?> updateExchangeStatus(@PathVariable Long id, @RequestParam ExchangeStatus exchangeStatus);
+    @PostMapping(path = "/rate/{exchangeId}")
+    ResponseEntity<?> rateExchange(@PathVariable Long exchangeId, @RequestParam double rate);
 }

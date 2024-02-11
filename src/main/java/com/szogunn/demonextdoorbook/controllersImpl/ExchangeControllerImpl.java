@@ -31,4 +31,9 @@ public class ExchangeControllerImpl implements ExchangeController {
     public ResponseEntity<?> updateExchangeStatus(Long id, ExchangeStatus exchangeStatus) {
         return exchangeService.changeExchangeStatus(id, exchangeStatus);
     }
+
+    @Override
+    public ResponseEntity<?> rateExchange(Long exchangeId, double rate) {
+        return exchangeService.rateExchange(rate, exchangeId);
+    }
 }

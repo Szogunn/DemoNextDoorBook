@@ -18,6 +18,8 @@ public class User {
     private Address address;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<Book> books;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "renter")
+    private Set<Exchange> exchanges;
 
     public User(String login, String password, String email) {
         this.login = login;
@@ -74,5 +76,13 @@ public class User {
 
     public void setBooks(Set<Book> books) {
         this.books = books;
+    }
+
+    public Set<Exchange> getExchanges() {
+        return exchanges;
+    }
+
+    public void setExchanges(Set<Exchange> exchanges) {
+        this.exchanges = exchanges;
     }
 }

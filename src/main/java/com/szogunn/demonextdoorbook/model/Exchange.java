@@ -18,6 +18,8 @@ public class Exchange {
     private LocalDate endRent;
     @Enumerated(value = EnumType.STRING)
     private ExchangeStatus status;
+    @Enumerated(value = EnumType.STRING)
+    private Rate rate;
 
     public Exchange(User renter, Book book, LocalDate startRent, LocalDate endRent) {
         this.renter = renter;
@@ -40,10 +42,6 @@ public class Exchange {
 
     public User getRenter() {
         return renter;
-    }
-
-    public void setRenter(User renter) {
-        this.renter = renter;
     }
 
     public Book getBook() {
@@ -76,5 +74,13 @@ public class Exchange {
 
     public void setStatus(ExchangeStatus status) {
         this.status = status;
+    }
+
+    public Rate getRate() {
+        return rate;
+    }
+
+    public void setRate(Rate rate) {
+        this.rate = rate;
     }
 }

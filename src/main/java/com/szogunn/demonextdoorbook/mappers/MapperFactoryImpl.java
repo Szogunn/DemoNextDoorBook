@@ -17,6 +17,7 @@ public class MapperFactoryImpl implements MapperFactory {
         mapperRegistry.put("UserToUserDTOMapperImpl" , new UserToUserDTOMapperImpl());
         mapperRegistry.put("ExchangeToExchangeDTOMapperImpl" , new ExchangeToExchangeDTOMapperImpl());
         mapperRegistry.put("AddressToAddressDTOMapperImpl" , new AddressToAddressDTOMapperImpl());
+        mapperRegistry.put("NotificationToNotificationDTOMapperImpl" , new NotificationToNotificationDTOMapperImpl());
     }
 
     @SuppressWarnings(value = "unchecked")
@@ -25,7 +26,7 @@ public class MapperFactoryImpl implements MapperFactory {
         Mapper<S, T> mapper = (Mapper<S, T>) mapperRegistry.get(sourceClass.getSimpleName() + CLASS_CONNECTOR + targetClass.getSimpleName() + IMPL);
 
         if (mapper == null){
-            throw new IllegalArgumentException("No mapper registered for object type: " );
+            throw new IllegalArgumentException(String.format("No mapper registered for object type: %s", sourceClass.getSimpleName()));
         }
 
         return mapper;
